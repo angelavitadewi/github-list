@@ -1,25 +1,27 @@
 import { Row, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
+import { connect, useDispatch } from 'react-redux';
+import { setLoading } from '../redux/CommonAction';
 import Repo from './Repo';
 import style from './SearchUsername.module.css';
 
-const ListRepo = ({ reposUrl }) => {
-  const [loading, setLoading] = useState(false);
+const ListRepo = ({ reposUrl, loading }) => {
   const [repos, setRepos] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (reposUrl) {
-      setLoading(true);
+      setLoading(dispatch, true);
       fetch(reposUrl)
         .then((res) => res.json())
         .then((data) => {
           setRepos(data);
         })
         .finally(() => {
-          setLoading(false);
+          setLoading(dispatch, false);
         });
     }
-  }, [reposUrl]);
+  }, [reposUrl, dispatch]);
   return (
     <>
       {loading ? (
@@ -35,4 +37,10 @@ const ListRepo = ({ reposUrl }) => {
   );
 };
 
-export default ListRepo;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.common.loading,
+  };
+};
+
+export default connect(mapStateToProps, null)(ListRepo);

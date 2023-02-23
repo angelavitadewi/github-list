@@ -1,15 +1,17 @@
 import { Image, Input } from 'antd';
 import { useState } from 'react';
+import { connect, useDispatch } from 'react-redux';
 import logo from '../asset/logo.png';
+import { setLoading } from '../redux/CommonAction';
 import ListUser from './ListUser';
 import style from './SearchUsername.module.css';
 
-const SearchUsername = () => {
-  const [loading, setLoading] = useState(false);
+const SearchUsername = (props) => {
   const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
   const onSearch = (search) => {
     if (search) {
-      setLoading(true);
+      setLoading(dispatch, true);
       fetch(`https://api.github.com/search/users?q=${search}&per_page=20`)
         .then((res) => res.json())
         .then((data) => {
@@ -17,7 +19,7 @@ const SearchUsername = () => {
           setUsers(users);
         })
         .finally(() => {
-          setLoading(false);
+          setLoading(dispatch, false);
         });
     }
   };
@@ -29,7 +31,7 @@ const SearchUsername = () => {
           placeholder='Search Github Account'
           enterButton='Search'
           size='large'
-          loading={loading}
+          loading={props.loading}
           onSearch={onSearch}
           className={style.mid40}
         />
@@ -39,4 +41,10 @@ const SearchUsername = () => {
   );
 };
 
-export default SearchUsername;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.common.loading,
+  };
+};
+
+export default connect(mapStateToProps, null)(SearchUsername);
